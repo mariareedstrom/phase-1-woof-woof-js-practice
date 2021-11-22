@@ -33,7 +33,7 @@ function handleDogSpanClick(e) {
   e.preventDefault();
   // get clicked dog
   let chosenDog = e.target;
-  console.log(chosenDog);
+
   // get with fetch function, then display info with render function
   fetchClickedDog(chosenDog.dataset.id).then((dog) => renderDog(dog));
 }
@@ -57,9 +57,11 @@ function renderDog(dog) {
 
   dogImg.src = dog.image;
   dogName.textContent = dog.name;
+  dogDiv.dataset.isGoodDog = dog.isGoodDog;
+  dogDiv.dataset.id = dog.id;
 
   // a button that says "Good Dog!" or "Bad Dog!" based on whether isGoodDog is true or false.
-  if (dog.isGoodDog === true) {
+  if (dog.isGoodDog) {
     dogStatusBtn.textContent = "Good Dog!";
   } else {
     dogStatusBtn.textContent = "Bad Dog!";
@@ -72,16 +74,33 @@ function renderDog(dog) {
 
 // function to toggle good bad btn
 function handleGoodBad(e) {
-  const dogStatusBtn = e.target;
   e.preventDefault();
-  // change innerText to opposite
-  if (dogStatusBtn.textContent === "Good Dog!") {
-    dogStatusBtn.textContent = "Bad Dog!";
-  } else {
-    dogStatusBtn.textContent = "Good Dog!";
-  }
-
+  const dogDiv = e.target.closest("#dog-info");
+  // access the isGoodDog value
+  const isGoodDog = !JSON.parse(dogDiv.dataset.isGoodDog);
   // update value to api
+  patchDogUpdate(dogDiv.dataset.id, isGoodDog).then((dog) => {
+    const dogStatusBtn = dogDiv.querySelector("button");
+    dogDiv.dataset.isGoodDog = isGoodDog;
+
+    // change innerText to opposite
+    if (dog.isGoodDog) {
+      dogStatusBtn.textContent = "Good Dog!";
+    } else {
+      dogStatusBtn.textContent = "Bad Dog!";
+    }
+  });
+}
+
+// send fetch PATC request to update isGoodDog Status
+function patchDogUpdate(dogId, isGoodDog) {
+  return fetch(`http://localhost:3000/pups/${dogId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ isGoodDog }),
+  }).then((resp) => resp.json());
 }
 
 // initialize
