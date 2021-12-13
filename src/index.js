@@ -46,6 +46,7 @@ function fetchClickedDog(dogId) {
 }
 
 // renderDog:
+
 function renderDog(dog) {
   const dogDiv = document.querySelector("#dog-info");
   // an img tag with the pup's image url
@@ -101,6 +102,18 @@ function patchDogUpdate(dogId, isGoodDog) {
     },
     body: JSON.stringify({ isGoodDog }),
   }).then((resp) => resp.json());
+}
+
+function filterDogs() {
+  const filterBtn = document.querySelector("#good-dog-filter");
+  filterBtn.addEventListener("click", handleFilterDogs);
+}
+// filter good dogs btn
+// if ON only fetch and render dogs wiht isGoodDog: true
+// switch btn from on to off when cliked and vice versa
+
+function handleFilterDogs(e) {
+  e.preventDefault();
 }
 
 // initialize
